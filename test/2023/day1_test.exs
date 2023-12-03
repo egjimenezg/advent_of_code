@@ -14,4 +14,19 @@ defmodule AdventOfCode2023.Day1Test do
     end
   end
 
+  test "extract first and last digit from line when there are numbers as strings" do
+    lines = [
+      {"two1nine", "29"},
+      {"eightwothree", "83"},
+      {"abcone2threexyz", "13"},
+      {"xtwone3four", "24"},
+      {"4nineeightseven2", "42"},
+      {"zoneight234", "14"},
+      {"7pqrstsixteen", "76"}
+    ]
+
+    for {line, two_digit_number} <- lines do
+      assert two_digit_number == AdventOfCode2023.Day1.join_first_and_last_digit(line)
+    end
+  end
 end
