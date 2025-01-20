@@ -31,5 +31,4 @@ defmodule AdventOfCode2023.Day2Test do
 
     assert 1 == AdventOfCode2023.Day2.sum_valid_games(games)
   end
-
 end
