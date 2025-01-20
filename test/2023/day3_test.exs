@@ -2,7 +2,7 @@ defmodule AdventOfCode2023.Day3Test do
   use ExUnit.Case
   alias AdventOfCode2023.Day3
 
-  test "build characters matrix from file content" do
+  test "build a character matrix from the contents of the file" do
     file_content = ["467..114.."]
     matrix = Day3.build_matrix(file_content)
 
@@ -23,7 +23,7 @@ defmodule AdventOfCode2023.Day3Test do
            )
   end
 
-  test "find_part_numbers/1 should returns the part numbers in the file" do
+  test "find_part_numbers/1 should return the part numbers in the file" do
     file_content = [
       "467..114..",
       "...*......"

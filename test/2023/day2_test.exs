@@ -1,9 +1,10 @@
 defmodule AdventOfCode2023.Day2Test do
   use ExUnit.Case
+  alias AdventOfCode2023.Day2
 
   test "group cubes number by color" do
     game = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
-    game_cubes = AdventOfCode2023.Day2.calculate_number_of_cubes_in_game(game)
+    game_cubes = Day2.calculate_number_of_cubes_in_game(game)
 
     assert {1,
             [
@@ -29,6 +30,6 @@ defmodule AdventOfCode2023.Day2Test do
        ]}
     ]
 
-    assert 1 == AdventOfCode2023.Day2.sum_valid_games(games)
+    assert 1 == Day2.sum_valid_games(games)
   end
 end

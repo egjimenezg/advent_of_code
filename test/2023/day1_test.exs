@@ -1,5 +1,6 @@
 defmodule AdventOfCode2023.Day1Test do
   use ExUnit.Case
+  alias AdventOfCode2023.Day1
 
   test "extract first and last digit of each line and form a single two digit number" do
     lines = [
@@ -10,7 +11,7 @@ defmodule AdventOfCode2023.Day1Test do
     ]
 
     for {line, two_digit_number} <- lines do
-      assert two_digit_number == AdventOfCode2023.Day1.join_first_and_last_digit(line)
+      assert two_digit_number == Day1.join_first_and_last_digit(line)
     end
   end
 
@@ -26,7 +27,7 @@ defmodule AdventOfCode2023.Day1Test do
     ]
 
     for {line, two_digit_number} <- lines do
-      assert two_digit_number == AdventOfCode2023.Day1.join_first_and_last_digit(line)
+      assert two_digit_number == Day1.join_first_and_last_digit(line)
     end
   end
 end
