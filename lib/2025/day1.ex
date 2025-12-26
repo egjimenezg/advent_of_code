@@ -3,7 +3,7 @@ defmodule AdventOfCode2025.Day1 do
 
   def answer_day_1() do
     File.stream!("priv/day1_2025_input.txt")
-    |> Enum.map(&String.replace(&1, "\n", ""))
+    |> Stream.map(&String.replace(&1, "\n", ""))
     |> Stream.scan(@initial_position, &rotate/2)
     |> Stream.filter(&(elem(&1, 0) == 0))
     |> Enum.count()
@@ -13,52 +13,47 @@ defmodule AdventOfCode2025.Day1 do
     File.stream!("priv/day1_2025_input.txt")
     |> Stream.map(&String.replace(&1, "\n", ""))
     |> Stream.scan(@initial_position, &rotate/2)
-    |> Enum.to_list()
-    |> Enum.reverse()
-    |> hd()
+    |> Enum.at(-1)
     |> elem(1)
   end
 
-  def rotate(rotation, {position, times_pointed_at_zero}) do
-    <<direction::binary-size(1), distance::binary>> = rotation
+  def rotate(<<"L", distance::binary>>, {position, times_pointed_to_zero}) do
     distance = String.to_integer(distance)
-    remainder = rem(distance, 100)
+    new_position = Integer.mod(position - distance, 100)
 
-    times_pointed_at_zero =
-      case distance do
-        distance when distance >= 100 ->
-          times_pointed_at_zero + div(distance - remainder, 100)
+    times_pointed_to_zero =
+      times_pointed_to_zero + count_times_pointed_to_zero("L", distance, position)
 
-        _ ->
-          times_pointed_at_zero
-      end
-
-    times_pointed_at_zero =
-      case {direction, position} do
-        {"L", 0} -> times_pointed_at_zero
-        {"L", position} when position - remainder <= 0 -> times_pointed_at_zero + 1
-        {"R", position} when position + remainder >= 100 -> times_pointed_at_zero + 1
-        {_, _} -> times_pointed_at_zero
-      end
-
-    new_position =
-      case direction do
-        "L" -> modulo(position - distance, 100)
-        "R" -> modulo(position + distance, 100)
-      end
-
-    {new_position, times_pointed_at_zero}
+    {new_position, times_pointed_to_zero}
   end
 
-  defp modulo(x, y) do
-    remainder = rem(x, y)
+  def rotate(<<"R", distance::binary>>, {position, times_pointed_to_zero}) do
+    distance = String.to_integer(distance)
+    new_position = Integer.mod(position + distance, 100)
 
-    case remainder do
-      remainder when remainder < 0 ->
-        remainder + y
+    times_pointed_to_zero =
+      times_pointed_to_zero + count_times_pointed_to_zero("R", distance, position)
+
+    {new_position, times_pointed_to_zero}
+  end
+
+  defp count_times_pointed_to_zero(direction, distance, position) do
+    remainder = rem(distance, 100)
+
+    times_pointed_to_zero =
+      case {direction, position} do
+        {"L", position} when position != 0 and position - remainder <= 0 -> 1
+        {"R", position} when position + remainder >= 100 -> 1
+        _ -> 0
+      end
+
+    case distance do
+      distance when distance >= 100 ->
+        div(distance - remainder, 100)
 
       _ ->
-        remainder
+        0
     end
+    |> Kernel.+(times_pointed_to_zero)
   end
 end

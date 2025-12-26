@@ -1,8 +1,8 @@
 defmodule AdventOfCode2025.Day1Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias AdventOfCode2025.Day1
 
-  test "rotate/2 moves the dial to the left and get the number of times it points to zero" do
+  test "rotate/2 moves the dial to the left and calculates the number of times it points to zero" do
     assert Day1.rotate("L68", {50, 0}) == {82, 1}
     assert Day1.rotate("L30", {52, 0}) == {22, 0}
     assert Day1.rotate("L5", {0, 0}) == {95, 0}
@@ -16,7 +16,7 @@ defmodule AdventOfCode2025.Day1Test do
     assert Day1.rotate("L100", {50, 1}) == {50, 2}
   end
 
-  test "rotate/2 moves the dial to the right and get the number of times it points to zero" do
+  test "rotate/2 moves the dial to the right and calculates the number of times it points to zero" do
     assert Day1.rotate("R48", {52, 0}) == {0, 1}
     assert Day1.rotate("R60", {95, 0}) == {55, 1}
     assert Day1.rotate("R14", {0, 0}) == {14, 0}
