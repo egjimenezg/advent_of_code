@@ -27,38 +27,67 @@ defmodule AdventOfCode2025.Day2 do
   end
 
   def invalid_id?(id) do
-    digits = to_digits(id)
+    id = Integer.to_string(id)
+    id_length = String.length(id)
+    table = longest_prefix_suffix_table(id)
 
-    case is_even(length(digits)) do
-      true -> validate_digits(digits)
-      false -> false
-    end
-  end
+    longest_prefix_suffix_length = Map.get(table, id_length)
 
-  defp validate_digits(digits) do
-    digits_length = length(digits)
-    left = Enum.take(digits, div(digits_length, 2))
-    right = Enum.take(digits, div(digits_length, 2) * -1)
-    left == right
-  end
-
-  defp to_digits(number) do
-    to_digits(number, [])
-  end
-
-  defp to_digits(number, digits) do
-    remainder = rem(number, 10)
-
-    case remainder do
-      remainder when remainder == number ->
-        [number | digits]
+    case longest_prefix_suffix_length do
+      0 ->
+        false
 
       _ ->
-        to_digits(div(number, 10), [remainder | digits])
+        digit_block_length = id_length - longest_prefix_suffix_length
+        rem(id_length, digit_block_length) == 0
     end
   end
 
-  defp is_even(value) do
-    rem(value, 2) == 0
+  defp longest_prefix_suffix_table(pattern) do
+    m = String.length(pattern)
+
+    pattern =
+      pattern
+      |> String.to_charlist()
+      |> Stream.with_index()
+      |> Map.new(fn {c, index} -> {index, c} end)
+
+    Map.new(0..m, fn n -> {n, 0} end)
+    |> Map.put(0, -1)
+    |> build_table(pattern, m)
   end
+
+  def build_table(back_table, pattern, pattern_length) do
+    build_table(back_table, pattern, pattern_length, {0, -1})
+  end
+
+  def build_table(back_table, pattern, pattern_length, {scan_index, border_length})
+      when scan_index < pattern_length do
+    border_length = update_border_length(back_table, pattern, {scan_index, border_length})
+    border_length = border_length + 1
+    scan_index = scan_index + 1
+
+    build_table(
+      Map.put(back_table, scan_index, border_length),
+      pattern,
+      pattern_length,
+      {scan_index, border_length}
+    )
+  end
+
+  def build_table(back_table, _, _, _), do: back_table
+
+  def update_border_length(back_table, pattern, {scan_index, border_length})
+      when border_length >= 0 do
+    case {Map.get(pattern, scan_index), Map.get(pattern, border_length)} do
+      {character, character} ->
+        border_length
+
+      _ ->
+        border_length = Map.get(back_table, border_length)
+        update_border_length(back_table, pattern, {scan_index, border_length})
+    end
+  end
+
+  def update_border_length(_, _, {_, border_length}), do: border_length
 end
