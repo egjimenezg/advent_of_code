@@ -12,7 +12,7 @@ defmodule AdventOfCode2023.Day1 do
   }
 
   def answer() do
-    File.stream!("priv/day1_input.txt")
+    File.stream!("priv/day1_2023_input.txt")
     |> Stream.map(&join_first_and_last_digit/1)
     |> Stream.map(&elem(Integer.parse(&1), 0))
     |> Enum.sum()
