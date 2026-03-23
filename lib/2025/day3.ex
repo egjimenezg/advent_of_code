@@ -1,49 +1,67 @@
 defmodule AdventOfCode2025.Day3 do
-  @base 10
-
-  def answer_part_1() do
+  defp read_input() do
     File.stream!("priv/day3_2025_input.txt")
     |> Stream.map(&String.replace(&1, "\n", ""))
-    |> Stream.map(&max_joltage/1)
+  end
+
+  def answer_part_1() do
+    read_input()
+    |> Stream.map(&max_joltage(&1, 2))
     |> Enum.sum()
   end
 
-  def max_joltage(bank) do
-    [first_digit | digits] =
-      bank
-      |> String.split("", trim: true)
-      |> Enum.map(&String.to_integer/1)
-
-    digits
-    |> Enum.with_index()
-    |> Enum.reduce(first_digit, fn {digit, index}, max_joltage ->
-      update_max_joltage(max_joltage, digit, index == length(digits) - 1)
-    end)
+  def answer_part_2() do
+    read_input()
+    |> Stream.map(&max_joltage(&1, 12))
+    |> Enum.sum()
   end
 
-  defp update_max_joltage(max_joltage, digit, last_battery?)
-       when max_joltage < @base and not last_battery? do
-    case {max_joltage, digit} do
-      {max_joltage, digit} when max_joltage < digit ->
-        digit
+  defp parse_digits(bank) do
+    bank
+    |> String.split("", trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  def max_joltage(bank, n) do
+    digits = parse_digits(bank)
+    remaining_omits = length(digits) - n
+    queue = :queue.new()
+
+    {queue, _} =
+      digits
+      |> Enum.reduce({queue, remaining_omits}, fn digit, {queue, remaining_omits} ->
+        select_max_digits(queue, digit, remaining_omits)
+      end)
+
+    :queue.to_list(queue)
+    |> Enum.join()
+    |> String.slice(0, n)
+    |> String.to_integer()
+  end
+
+  defp select_max_digits(queue, digit, remaining_omits) do
+    case {:queue.peek_r(queue), remaining_omits} do
+      {:empty, _} ->
+        {:queue.in(digit, queue), remaining_omits}
+
+      {{:value, last}, remaining_omits} when remaining_omits == 0 or digit <= last ->
+        {:queue.in(digit, queue), remaining_omits}
 
       _ ->
-        max_joltage * 10 + digit
+        drop_rear_while_gt(queue, digit, remaining_omits)
     end
   end
 
-  defp update_max_joltage(max_joltage, digit, _) when max_joltage < @base do
-    max_joltage * 10 + digit
-  end
+  def drop_rear_while_gt(queue, digit, remaining_omits) do
+    case {:queue.peek_r(queue), remaining_omits} do
+      {{:value, last}, remaining_omits} when digit > last and remaining_omits > 0 ->
+        {_, queue} = :queue.out_r(queue)
+        remaining_omits = remaining_omits - 1
+        drop_rear_while_gt(queue, digit, remaining_omits)
 
-  defp update_max_joltage(max_joltage, digit, last_battery?) do
-    battery_a = div(max_joltage, @base)
-    battery_b = rem(max_joltage, @base)
-
-    case {digit, battery_a, battery_b} do
-      {digit, battery_a, _} when digit > battery_a and not last_battery? -> digit
-      {digit, battery_a, battery_b} when digit > battery_b -> battery_a * @base + digit
-      _ -> max_joltage
+      _ ->
+        queue = :queue.in(digit, queue)
+        {queue, remaining_omits}
     end
   end
 end
